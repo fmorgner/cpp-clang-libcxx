@@ -74,6 +74,7 @@ build_type=Release
 compiler=clang
 compiler.libcxx=libc++
 compiler.version=${1}
+os=$(uname -s)
 EOC
 }
 
