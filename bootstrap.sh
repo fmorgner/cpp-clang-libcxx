@@ -21,6 +21,12 @@ function _check_environment()
 
   _check_command xbps-install
   _check_command arch-chroot
+
+  if [[ -d docker-void && -z "${KEEP_OLD}" ]]; then
+    echo "== [BOOTSTRAP] Removing leftovers from prior builds =="
+
+    rm -rf docker-void
+  fi
 }
 
 function _bootstrap_void()
