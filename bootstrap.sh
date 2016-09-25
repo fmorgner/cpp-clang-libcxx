@@ -33,6 +33,7 @@ function _bootstrap_void()
 {
   echo "== [BOOTSTRAP] Initializing Void Linux =="
 
+  echo "Y" | \
   xbps-install --automatic \
     --yes \
     --rootdir=${PWD}/docker-void \
