@@ -41,12 +41,15 @@ function _bootstrap_void()
     git \
     gnupg \
     ninja \
+    python \
     python3.4 \
     python3.4-pip || true
 }
 
 function _bootstrap_conan
 {
+  echo "nameserver 8.8.8.8" >> docker-void/etc/resolv.conf
+
   echo "== [BOOTSTRAP] Installing Conan.io =="
 
   arch-chroot docker-void pip --no-cache-dir install conan 2>&1
@@ -58,7 +61,7 @@ function _bootstrap_conan
 [storage]
 path:~/.conan/data
 
-[settings_default]
+[settings_defaults]
 arch=x86_64
 build_type=Release
 compiler=clang
@@ -81,12 +84,16 @@ function _build_clang()
 
 function _dockerize()
 {
+  echo "== [BOOTSTRAP] Cleaning target resolv.conf =="
+
+  rm -f docker-void/etc/resolv.conf
+
   echo "== [BOOTSTRAP] Cleaning target bash history =="
 
   rm -f docker-void/root/.bash_history
 
   echo "== [BOOTSTRAP] Building docker image =="
-  docker build . -t fmorgner/cpp-clang-libcxx:${1}
+  tar -pC docker-void -c . | docker import -c "ENV CC clang" -c "ENV CXX clang++" - fmorgner/cpp-clang-libcxx:${1}
 }
 
 LLVM_VERSION_FULL=$1

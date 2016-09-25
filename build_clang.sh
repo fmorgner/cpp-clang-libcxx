@@ -8,16 +8,16 @@ function _download_source()
 
   echo "== [LLVM/Clang] Importing LLVM release key =="
   gpg --version &>/dev/null
-  gpg --recv-keys 0x8f0871f202119294
+  gpg --keyserver pool.sks-keyservers.net --recv-keys 0x8f0871f202119294
 
   for package in {llvm,cfe,clang-tools-extra,compiler-rt,libcxx,libcxxabi}; do
-    (echo "== [LLVM/Clang] Fetching ${package} ${LLVM_VERSION} source =="
+    echo "== [LLVM/Clang] Fetching ${package} ${LLVM_VERSION} source =="
     curl --progress-bar -O http://llvm.org/releases/${LLVM_VERSION}/${package}-${LLVM_VERSION}.src.tar.xz || exit 1
     echo "== [LLVM/Clang] Fetching ${package} ${LLVM_VERSION} signature =="
     curl --progress-bar -O http://llvm.org/releases/${LLVM_VERSION}/${package}-${LLVM_VERSION}.src.tar.xz.sig || exit 1
 
     echo "== [LLVM/Clang] Verifying signature of ${package} ${LLVM_VERSION} =="
-    gpg --quiet ${package}-${LLVM_VERSION}.src.tar.xz.sig) || exit 1
+    gpg ${package}-${LLVM_VERSION}.src.tar.xz.sig 2>&1 | grep "gpg: Good signature" || exit 1
   done
 }
 
@@ -76,7 +76,7 @@ function _stage_one()
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_INCLUDE_TESTS=OFF \
     -DLLVM_TARGETS_TO_BUILD=X86 \
-    ../llvm >/dev/null
+    ../llvm &>/dev/null
 
   echo "== [LLVM/Clang] Executing build =="
   cmake --build . --target install -- -j$(nproc)
@@ -115,9 +115,10 @@ function _stage_two()
     -DLLVM_ENABLE_CXX1Y=ON \
     -DLIBCXX_CXX_ABI=libcxxabi \
     -DLIBCXX_LIBCXXABI_INCLUDE_PATHS="../llvm/projects/libcxxabi/include" \
+    -DLIBCXX_CXX_ABI_INCLUDE_PATHS="../llvm/projects/libcxxabi/include" \
     -DLIBCXX_CXX_ABI_LIBRARY_PATH="/usr/lib" \
     -DCPACK_GENERATOR=TGZ \
-    ../llvm
+    ../llvm &>/dev/null
 
   echo "== [LLVM/Clang] Executing build =="
   cmake --build . --target install -- -j$(nproc)
