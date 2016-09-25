@@ -8,7 +8,8 @@ function _download_source()
 
   echo "== [LLVM/Clang] Importing LLVM release key =="
   gpg --version &>/dev/null
-  gpg --keyserver pool.sks-keyservers.net --recv-keys 0x8f0871f202119294
+  gpg --keyserver pgp.mit.edu --recv-keys 0x8f0871f202119294
+  gpg --keyserver pgp.mit.edu --recv-keys 0x0fc3042e345ad05d
 
   for package in {llvm,cfe,clang-tools-extra,compiler-rt,libcxx,libcxxabi}; do
     echo "== [LLVM/Clang] Fetching ${package} ${LLVM_VERSION} source =="
